@@ -4,51 +4,59 @@ new Vue ({
         playerHp: 100,
         monsterHp: 100,
         logs: [],
-    },
-   computed:{
-        updatePlayerHp(){
-            return{width: this.playerHp + "%"}
-        },
-        updateMonsterHp(){
-            return {width: this.monsterHp + "%"}
-        },
+        end: false,
+        game: false
     },
     methods:{
-        randomDmg(){
-            return 5+Math.floor(Math.random()*5);
+        updateHp(kind){
+            if(kind == 'player')return{width: this.playerHp + "%"};
+            return {width: this.monsterHp + "%"}
         },
-        randomHeal(){
-            return 3+Math.floor(Math.random()*9);
+        randomNum(min, length){
+            return  min+Math.floor(Math.random()*length)
         },
-        resetGame: function(){
+        resetGame(){
             this.playerHp = 100;
             this.monsterHp = 100;
             this.logs = [];
+            this.end = false;
+            this.game = true;
         },
-        playerAtk: function(){
-            let playerDmg = this.randomDmg();
-            console.log(playerDmg);
-            this.monsterHp -= playerDmg;
-            this.logs.unshift(`Player damages monster by ${playerDmg} points`);
-            this.monsterAtk();
+        attack(kind, special){
+            let damage = 0;
+            if(!special) damage = this.randomNum(5,9);
+            else damage = this.randomNum(3,11);
+            if (kind == 'player'){
+                this.monsterHp -= damage;
+                if (this.monsterHp < 0) this.monsterHp = 0;
+                this.logs.unshift(`Player hits monster by ${damage} points`);
+                this.endCheck();
+                if(!this.end)this.attack('monster',true);
+            }
+            else{
+                this.playerHp -= damage;
+                if (this.playerHp < 0) this.playerHp = 0;
+                this.logs.unshift(`Monster hits player by ${damage} points`);
+                this.endCheck();
+            }
         },
-        monsterAtk: function(){
-            let monsterDmg = this.randomDmg();
-            this.playerHp -= monsterDmg;
-            this.logs.unshift(`Monster damages player by ${monsterDmg} points`);
-        },
-        giveUp: function(){
+        giveUp(){
             this.playerHp = 0;
-            this.logs.unshift(`Defeat!`);
+            this.endCheck();
         },
-        playerHeal: function(){
-            // heals between 3 and 11
-            let healPlayer = this.randomHeal()
-            this.playerHp += healPlayer;
-            this.logs.unshift(`Player heals by ${healPlayer} points`);
-            setTimeout(() => this.monsterAtk(), 1000);
+        heal(){
+            this.playerHp += 7;
+            if (this.playerHp > 100) this.playerHp = 100;
+            this.logs.unshift(`Player heals by 7 points`);
+            this.attack('monster');
+        },
+        endCheck(){
+            if (this.playerHp == 0 | this.monsterHp == 0){
+                if(this.playerHp == 0)this.logs.unshift('Defeat!'); 
+                else this.logs.unshift('Victory!')
+                this.end = true; 
+                setTimeout(() => this.resetGame(), 1000);
+            }
         }
     }
-
-
 });

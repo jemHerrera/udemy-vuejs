@@ -12,7 +12,7 @@
         <div class="small-6 columns">
             <h1 class="text-center">YOU</h1>
             <div class="healthbar">
-                <div v-bind:style="updatePlayerHp" class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
+                <div v-bind:style="updateHp('player')" class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
                     {{playerHp}}%
                 </div>
             </div>
@@ -20,7 +20,7 @@
         <div class="small-6 columns">
             <h1 class="text-center">MONSTER</h1>
             <div class="healthbar">
-                <div v-bind:style="updateMonsterHp" class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
+                <div v-bind:style="updateHp('monster')" class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
                     {{monsterHp}}%
                 </div>
             </div>
@@ -31,15 +31,15 @@
             <button v-on:click="resetGame" id="start-game">START NEW GAME</button>
         </div>
     </section>
-    <section class="row controls">
+    <section class="row controls" v-if="game">
         <div class="small-12 columns">
-            <button v-on:click="playerAtk" id="attack">ATTACK</button>
-            <button id="special-attack">SPECIAL ATTACK</button>
-            <button v-on:click="playerHeal" id="heal">HEAL</button>
+            <button v-on:click="attack('player')" id="attack">ATTACK</button>
+            <button v-on:click="attack('player', special)" id="special-attack">SPECIAL ATTACK</button>
+            <button v-on:click="heal" id="heal">HEAL</button>
             <button v-on:click="giveUp" id="give-up">GIVE UP</button>
         </div>
     </section>
-    <section class="row log">
+    <section class="row log" v-if="game">
         <div class="small-12 columns">
             <ul>
                 <li v-for="log in logs">
